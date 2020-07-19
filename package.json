@@ -5,10 +5,11 @@
 	"engines": {
 		"node": ">=10"
 	},
+	"homepage": "https://ahoak.github.io/renderer-benchmark",
 	"dependencies": {
+		"@essex/eslint-config": "7.1.0",
 		"@essex/prettier-config": "7.3.2",
 		"@essex/scripts": "7.3.2",
-		"@essex/eslint-config": "7.1.0",
 		"@fluentui/react": "^7.123.3",
 		"@pixi/canvas-renderer": "^5.3.0",
 		"@testing-library/jest-dom": "^4.2.4",
@@ -59,7 +60,9 @@
 		}
 	},
 	"scripts": {
+		"predeploy": "npm run build",
 		"start": "react-scripts start",
+		"deploy": "gh-pages -d build",
 		"build": "react-scripts build",
 		"lint": "essex lint",
 		"prettify": "essex prettify",
@@ -76,5 +79,8 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
+	},
+	"devDependencies": {
+		"gh-pages": "^3.1.0"
 	}
 }
