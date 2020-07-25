@@ -1,10 +1,12 @@
 import { select } from 'd3-selection'
 import 'd3-transition'
 import { Data } from '../../../hooks/useData'
+import { instrumentTransition } from '../../../utils/instrumentation'
 
 export interface D3RendererProps {
 	duration: number
 	svgElementRef: SVGElement
+	onTransitionComplete: (metrics: any) => void
 }
 
 export class D3Renderer {
@@ -12,10 +14,22 @@ export class D3Renderer {
 	private svgElementRef: SVGElement
 	private initialized = false
 	private currDataLength = 0
+	private onTransitionComplete: (metrics: any) => void
 
-	constructor({ duration, svgElementRef }: D3RendererProps) {
+	constructor({
+		duration,
+		onTransitionComplete,
+		svgElementRef,
+	}: D3RendererProps) {
 		this.duration = duration
+		this.onTransitionComplete = onTransitionComplete
 		this.svgElementRef = svgElementRef
+	}
+
+	private handleInstrumentationComplete(metrics: any) {
+		if (this.onTransitionComplete) {
+			this.onTransitionComplete(metrics)
+		}
 	}
 
 	public onRendererSwitch(data: Data[]) {
@@ -49,7 +63,7 @@ export class D3Renderer {
 
 	private updateTransition(data: Data[]) {
 		const svg = select(this.svgElementRef)
-		svg
+		const transition = svg
 			.selectAll('.d3-node')
 			.data(data, (d: any) => d.index)
 			.interrupt()
@@ -57,6 +71,10 @@ export class D3Renderer {
 			.duration(this.duration)
 			.attr('cx', (d: Data) => d.cx1)
 			.attr('cy', (d: Data) => d.cy1)
+
+		instrumentTransition(transition).then(metrics =>
+			this.handleInstrumentationComplete(metrics),
+		)
 	}
 
 	public remove() {

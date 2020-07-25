@@ -11,6 +11,7 @@ export interface PixiContainerProps {
 	height: number
 	duration: number
 	renderer: Renderers
+	onTransitionComplete: (metrics: any) => void
 }
 
 export const PixiContainer: React.FC<PixiContainerProps> = memo(
@@ -20,6 +21,7 @@ export const PixiContainer: React.FC<PixiContainerProps> = memo(
 		height,
 		duration,
 		renderer,
+		onTransitionComplete,
 	}: PixiContainerProps) {
 		const [setCanvasElement, canvasElement] = useCallbackRef<HTMLDivElement>()
 		// setup pixi instance
@@ -29,6 +31,7 @@ export const PixiContainer: React.FC<PixiContainerProps> = memo(
 			height,
 			containerElement: canvasElement,
 			duration,
+			onTransitionComplete,
 			renderer,
 		})
 

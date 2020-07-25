@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState, useCallback } from 'react'
 import styled from 'styled-components'
 import { Renderers } from '../Controls/RendererControls/RendererControls'
 import { Data } from '../../hooks/useData'
@@ -20,9 +20,19 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 		height,
 		renderer,
 	}: ChartContainerProps) {
+		const [lastFPS, setLastFPS] = useState<number>(0)
+
+		const handleTransitionComplete = useCallback(
+			(metrics: any) => {
+				setLastFPS(metrics.fps)
+			},
+			[setLastFPS],
+		)
+
 		return (
 			<>
-				{' '}
+				<div className={'fps'}>{`${Math.round(lastFPS)} FPS`}</div>
+
 				<ChartStyle>
 					<PixiContainer
 						data={data}
@@ -30,6 +40,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 						height={height}
 						duration={DURATION}
 						renderer={renderer}
+						onTransitionComplete={handleTransitionComplete}
 					/>
 					<D3Container
 						data={data}
@@ -37,6 +48,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 						height={height}
 						duration={DURATION}
 						renderer={renderer}
+						onTransitionComplete={handleTransitionComplete}
 					/>
 				</ChartStyle>
 			</>

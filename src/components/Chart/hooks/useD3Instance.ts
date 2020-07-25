@@ -9,6 +9,7 @@ export interface D3Instance {
 	containerElement: SVGGElement | null
 	duration: number
 	renderer: Renderers
+	onTransitionComplete: (metrics: any) => void
 }
 
 export function useD3Instance({
@@ -16,6 +17,7 @@ export function useD3Instance({
 	containerElement,
 	duration,
 	renderer,
+	onTransitionComplete,
 }: D3Instance): D3Renderer | undefined {
 	const [D3Instance, setD3Instance] = useState<D3Renderer | undefined>()
 
@@ -24,12 +26,13 @@ export function useD3Instance({
 			if (!instance && containerElement !== null) {
 				const D3Instance = new D3Renderer({
 					duration,
+					onTransitionComplete,
 					svgElementRef: containerElement,
 				})
 				setD3Instance(D3Instance)
 			}
 		},
-		[containerElement, duration],
+		[containerElement, duration, onTransitionComplete],
 	)
 
 	useEffect(() => {

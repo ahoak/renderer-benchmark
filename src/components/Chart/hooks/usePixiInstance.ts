@@ -11,6 +11,7 @@ export interface PixiInstance {
 	height: number
 	duration: number
 	renderer: Renderers
+	onTransitionComplete: (metrics: any) => void
 }
 
 export function usePixiInstance({
@@ -20,6 +21,7 @@ export function usePixiInstance({
 	containerElement,
 	duration,
 	renderer,
+	onTransitionComplete,
 }: PixiInstance): PixiRenderer | undefined {
 	const [pixiInstance, setPixiInstance] = useState<PixiRenderer | undefined>()
 
@@ -41,6 +43,7 @@ export function usePixiInstance({
 						dimensions.height,
 						duration,
 						containerElement,
+						onTransitionComplete,
 						renderer,
 					)
 					setPixiInstance(pixiInstance)
@@ -52,7 +55,14 @@ export function usePixiInstance({
 				setPixiInstance(undefined)
 			}
 		},
-		[containerElement, dimensions, duration, data, renderer],
+		[
+			containerElement,
+			dimensions,
+			duration,
+			data,
+			renderer,
+			onTransitionComplete,
+		],
 	)
 
 	useEffect(() => {

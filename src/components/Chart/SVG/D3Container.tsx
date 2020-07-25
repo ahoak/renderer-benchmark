@@ -9,6 +9,7 @@ export interface D3RendererProps {
 	renderer: Renderers
 	width: number
 	height: number
+	onTransitionComplete: (metrics: any) => void
 }
 export const D3Container: React.FC<D3RendererProps> = memo(
 	function D3Container({
@@ -17,6 +18,7 @@ export const D3Container: React.FC<D3RendererProps> = memo(
 		renderer,
 		width,
 		height,
+		onTransitionComplete,
 	}: D3RendererProps) {
 		// Get Refs for SVG Elements
 		const [setD3ContainerElement, d3ChartContainerElement] = useCallbackRef<
@@ -28,6 +30,7 @@ export const D3Container: React.FC<D3RendererProps> = memo(
 			duration,
 			renderer,
 			containerElement: d3ChartContainerElement,
+			onTransitionComplete,
 		})
 
 		const style = useMemo(

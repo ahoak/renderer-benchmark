@@ -9,27 +9,29 @@ export enum Renderers {
 	WebGL = 'WebGL',
 }
 
+const imageSize = { width: 32, height: 32 }
+
 export const RendererOptions: IChoiceGroupOption[] = [
 	{
 		key: Renderers.SVG,
 		text: Renderers.SVG,
-		imageSrc: '/images/turtle-outline.svg',
-		selectedImageSrc: '/images/turtle.svg',
-		imageSize: { width: 32, height: 32 },
+		imageSrc: `${process.env.PUBLIC_URL}/images/turtle-outline.svg`,
+		selectedImageSrc: `${process.env.PUBLIC_URL}/images/turtle.svg`,
+		imageSize,
 	},
 	{
 		key: Renderers.Canvas,
 		text: Renderers.Canvas,
-		imageSrc: '/images/rabbit-outline.svg',
-		selectedImageSrc: '/images/rabbit.svg',
-		imageSize: { width: 32, height: 32 },
+		imageSrc: `${process.env.PUBLIC_URL}/images/rabbit-outline.svg`,
+		selectedImageSrc: `${process.env.PUBLIC_URL}/images/rabbit.svg`,
+		imageSize,
 	},
 	{
 		key: Renderers.WebGL,
 		text: Renderers.WebGL,
-		imageSrc: '/images/cheetah-outline.svg',
-		selectedImageSrc: '/images/cheetah.svg',
-		imageSize: { width: 32, height: 32 },
+		imageSrc: `${process.env.PUBLIC_URL}/images/cheetah-outline.svg`,
+		selectedImageSrc: `${process.env.PUBLIC_URL}/images/cheetah.svg`,
+		imageSize,
 	},
 ]
 

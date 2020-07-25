@@ -25,12 +25,14 @@ class PixiRenderer {
 	private spriteMap: SpriteMap = {}
 	private rendererType: Renderers
 	private currDataLength = 0
+	private onTransitionComplete?: (metrics: any) => void
 
 	constructor(
 		width: number,
 		height: number,
 		duration: number,
 		containerEl: HTMLDivElement,
+		onTransitionComplete: (metrics: any) => void,
 		renderer: Renderers,
 	) {
 		this.currDataLength = 0
@@ -39,6 +41,8 @@ class PixiRenderer {
 		this.rendererType = renderer
 		this.duration = duration
 		this.dimensions = { height, width }
+		this.onTransitionComplete = onTransitionComplete
+
 		// ==== set up pixi stuff
 		this.renderer = this.setRenderer(renderer, this.dimensions)
 		const circleTemplate = new PIXI.Graphics()
@@ -77,6 +81,12 @@ class PixiRenderer {
 
 	public getRendererType(): Renderers {
 		return this.rendererType
+	}
+
+	private handleInstrumentationComplete(metrics: any) {
+		if (this.onTransitionComplete) {
+			this.onTransitionComplete(metrics)
+		}
 	}
 
 	public remove(): void {
@@ -125,6 +135,7 @@ class PixiRenderer {
 	}
 
 	private updateTransition(data: Data[]) {
+		let frames = 0
 		const tweenRender = (newTime: number) => {
 			const deltaTime = newTime - start
 			const percent = deltaTime / this.duration
@@ -138,9 +149,21 @@ class PixiRenderer {
 				sprite.width = node.r * 2
 				sprite.height = node.r * 2
 			})
+			frames++
 			this.renderPixi()
 			if (percent < 1.0) {
 				requestAnimationFrame(tweenRender)
+			} else {
+				// calculate fps metrics
+				const end = performance.now()
+				const delta = end - start
+				this.handleInstrumentationComplete({
+					start,
+					end,
+					delta,
+					frames,
+					fps: frames / (delta / 1000),
+				})
 			}
 		}
 		const start = performance.now()
