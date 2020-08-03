@@ -31,8 +31,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 
 		return (
 			<>
-				<div className={'fps'}>{`${Math.round(lastFPS)} FPS`}</div>
-
+				<FPSCounter>{`${Math.round(lastFPS)} FPS`}</FPSCounter>
 				<ChartStyle>
 					<PixiContainer
 						data={data}
@@ -56,6 +55,10 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 	},
 )
 
+const FPSCounter = styled.div`
+	font-size: 100px;
+	margin-left: 100px;
+`
 const ChartStyle = styled.div`
 	width: 100%;
 	height: 100%;
