@@ -25,14 +25,16 @@ class PixiRenderer {
 	private spriteMap: SpriteMap = {}
 	private rendererType: Renderers
 	private currDataLength = 0
-	private onTransitionComplete?: (metrics: any) => void
+	private inTransition: boolean = false
+	private cancelOp: boolean = false
+	private onTransitionComplete?: (metrics: any, tweenToggle: boolean) => void
 
 	constructor(
 		width: number,
 		height: number,
 		duration: number,
 		containerEl: HTMLDivElement,
-		onTransitionComplete: (metrics: any) => void,
+		onTransitionComplete: (metrics: any, tweenToggle: boolean) => void,
 		renderer: Renderers,
 	) {
 		this.currDataLength = 0
@@ -83,9 +85,10 @@ class PixiRenderer {
 		return this.rendererType
 	}
 
-	private handleInstrumentationComplete(metrics: any) {
+	private handleInstrumentationComplete(metrics: any, tweenToggle: boolean) {
+		this.inTransition = false
 		if (this.onTransitionComplete) {
-			this.onTransitionComplete(metrics)
+			this.onTransitionComplete(metrics, tweenToggle)
 		}
 	}
 
@@ -98,6 +101,11 @@ class PixiRenderer {
 		}
 	}
 
+	public cancel(): void {
+		this.cancelOp = true
+		this.remove()
+	}
+
 	private refresh(): void {
 		this.initialized = false
 		this.spriteMap = {}
@@ -106,17 +114,18 @@ class PixiRenderer {
 		this.stage.addChild(this.nodesStage)
 	}
 
-	public onRendererSwitch(data: Data[]): void {
+	public onRendererSwitch(data: Data[], tweenToggle: boolean): void {
 		if (this.currDataLength !== data.length) {
 			this.refresh()
 			this.currDataLength = data.length
 		}
-		if (!this.initialized) {
-			this.enter(data)
-			this.initialized = true
-			this.updateTransition(data)
-		} else {
-			this.updateTransition(data)
+		if (!this.inTransition) {
+			this.inTransition = true
+			if (!this.initialized) {
+				this.initialized = true
+				this.enter(data)
+			}
+			this.updateTransition(data, tweenToggle)
 		}
 	}
 	private enter(data: Data[]): void {
@@ -134,43 +143,59 @@ class PixiRenderer {
 		this.renderPixi()
 	}
 
-	private updateTransition(data: Data[]) {
+	private updateTransition(data: Data[], tweenToggle: boolean) {
 		let frames = 0
 		const tweenRender = (newTime: number) => {
 			const deltaTime = newTime - start
 			const percent = deltaTime / this.duration
-			data.forEach(node => {
-				const sprite = this.spriteMap[`${node.index}`] as PIXI.Sprite
-				// percent * (current - prev) + prev
-				const cx = easeCubic(percent) * (node.cx1 - node.cx) + node.cx
-				const cy = easeCubic(percent) * (node.cy1 - node.cy) + node.cy
-				sprite.x = cx
-				sprite.y = cy
-				sprite.width = node.r * 2
-				sprite.height = node.r * 2
-			})
+			if (data) {
+				data.forEach(node => {
+					const sprite = this.spriteMap[`${node.index}`] as PIXI.Sprite
+					if (sprite) {
+						// percent * (current - prev) + prev
+						const cx = easeCubic(percent) * (node.cx1 - node.cx) + node.cx
+						const cy = easeCubic(percent) * (node.cy1 - node.cy) + node.cy
+						sprite.x = cx
+						sprite.y = cy
+						sprite.width = node.r * 2
+						sprite.height = node.r * 2
+					}
+				})
+				this.renderPixi()
+			}
+
 			frames++
-			this.renderPixi()
-			if (percent < 1.0) {
+			if (percent < 1.0 && !this.cancelOp) {
 				requestAnimationFrame(tweenRender)
 			} else {
 				// calculate fps metrics
 				const end = performance.now()
 				const delta = end - start
-				this.handleInstrumentationComplete({
-					start,
-					end,
-					delta,
-					frames,
-					fps: frames / (delta / 1000),
-				})
+				this.handleInstrumentationComplete(
+					{
+						start,
+						end,
+						delta,
+						frames,
+						fps: frames / (delta / 1000),
+					},
+					tweenToggle,
+				)
 			}
 		}
 		const start = performance.now()
 		requestAnimationFrame(tweenRender)
 	}
 	private renderPixi(): void {
-		this.renderer.render(this.stage)
+		if (
+			this.renderer &&
+			this.renderer !== null &&
+			this.stage &&
+			this.stage !== null &&
+			!this.cancelOp
+		) {
+			this.renderer.render(this.stage)
+		}
 	}
 
 	public resize(width: number, height: number): void {

@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo, useMemo, useCallback } from 'react'
 import { useCallbackRef } from '../hooks/useCallbackRef'
 import { Data } from '../../../hooks/useData'
 import { Renderers } from '../../Controls/RendererControls'
@@ -9,7 +9,9 @@ export interface D3RendererProps {
 	renderer: Renderers
 	width: number
 	height: number
-	onTransitionComplete: (metrics: any) => void
+	tweenToggle: Boolean
+	setToggle: (toggleState: Boolean) => void
+	setLastFPS: (fps: number) => void
 }
 export const D3Container: React.FC<D3RendererProps> = memo(
 	function D3Container({
@@ -18,19 +20,32 @@ export const D3Container: React.FC<D3RendererProps> = memo(
 		renderer,
 		width,
 		height,
-		onTransitionComplete,
+		tweenToggle,
+		setToggle,
+		setLastFPS,
 	}: D3RendererProps) {
 		// Get Refs for SVG Elements
 		const [setD3ContainerElement, d3ChartContainerElement] = useCallbackRef<
 			SVGGElement
 		>()
 
+		const handleTransitionComplete = useCallback(
+			(metrics: any, tweenToggle: Boolean) => {
+				if (renderer === Renderers.SVG) {
+					setToggle(!tweenToggle)
+					setLastFPS(metrics.fps)
+				}
+			},
+			[setLastFPS, setToggle, renderer],
+		)
+
 		useD3Instance({
 			data,
 			duration,
 			renderer,
 			containerElement: d3ChartContainerElement,
-			onTransitionComplete,
+			onTransitionComplete: handleTransitionComplete,
+			tweenToggle,
 		})
 
 		const style = useMemo(

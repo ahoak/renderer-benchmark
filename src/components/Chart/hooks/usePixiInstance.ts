@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import PixiRenderer from '../PIXI/PixiRenderer'
 import { Dimensions } from '../../../utils/types'
 import { Data } from '../../../hooks/useData'
@@ -11,7 +11,9 @@ export interface PixiInstance {
 	height: number
 	duration: number
 	renderer: Renderers
-	onTransitionComplete: (metrics: any) => void
+	pixiRenderer: Renderers
+	onTransitionComplete: (metrics: any, tweenToggle: boolean) => void
+	tweenToggle: boolean
 }
 
 export function usePixiInstance({
@@ -21,7 +23,9 @@ export function usePixiInstance({
 	containerElement,
 	duration,
 	renderer,
+	pixiRenderer,
 	onTransitionComplete,
+	tweenToggle,
 }: PixiInstance): PixiRenderer | undefined {
 	const [pixiInstance, setPixiInstance] = useState<PixiRenderer | undefined>()
 
@@ -33,51 +37,42 @@ export function usePixiInstance({
 		return { width, height }
 	}, [width, height, pixiInstance])
 
-	const setUpPixi = useCallback(
-		(instance?: PixiRenderer) => {
-			if (renderer !== Renderers.SVG) {
-				let pixiInstance = instance
-				if (!pixiInstance && containerElement !== null) {
-					pixiInstance = new PixiRenderer(
-						dimensions.width,
-						dimensions.height,
-						duration,
-						containerElement,
-						onTransitionComplete,
-						renderer,
-					)
-					setPixiInstance(pixiInstance)
-				}
-				if (pixiInstance) {
-					pixiInstance.onRendererSwitch(data)
-				}
-			} else {
-				setPixiInstance(undefined)
+	const setUpPixi = useCallback(() => {
+		if (renderer === pixiRenderer) {
+			if (containerElement !== null) {
+				const pixiInstance = new PixiRenderer(
+					dimensions.width,
+					dimensions.height,
+					duration,
+					containerElement,
+					onTransitionComplete,
+					renderer,
+				)
+				setPixiInstance(pixiInstance)
 			}
-		},
-		[
-			containerElement,
-			dimensions,
-			duration,
-			data,
-			renderer,
-			onTransitionComplete,
-		],
-	)
+		}
+	}, [
+		containerElement,
+		dimensions,
+		duration,
+		renderer,
+		onTransitionComplete,
+		pixiRenderer,
+	])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (pixiInstance) {
 			const currentRenderer = pixiInstance.getRendererType()
 			if (currentRenderer !== renderer) {
-				pixiInstance.remove()
-				setUpPixi()
+				pixiInstance.cancel()
+				setPixiInstance(undefined)
 			} else {
-				pixiInstance.onRendererSwitch(data)
+				pixiInstance.onRendererSwitch(data, tweenToggle)
 			}
 		} else {
-			setUpPixi(pixiInstance)
+			setUpPixi()
 		}
-	}, [pixiInstance, renderer, setUpPixi, data])
+	}, [pixiInstance, renderer, setUpPixi, data, tweenToggle])
 
 	return pixiInstance
 }

@@ -1,9 +1,10 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo } from 'react'
 import styled from 'styled-components'
 import { Data } from '../../../hooks/useData'
 import { useCallbackRef } from '../hooks/useCallbackRef'
 import { usePixiInstance } from '../hooks/usePixiInstance'
 import { Renderers } from '../../Controls/RendererControls'
+import { useTweenData } from '../hooks/useTweenData'
 
 export interface PixiContainerProps {
 	data: Data[]
@@ -11,7 +12,8 @@ export interface PixiContainerProps {
 	height: number
 	duration: number
 	renderer: Renderers
-	onTransitionComplete: (metrics: any) => void
+	pixiRenderer: Renderers
+	setLastFPS: (fps: number) => void
 }
 
 export const PixiContainer: React.FC<PixiContainerProps> = memo(
@@ -21,37 +23,29 @@ export const PixiContainer: React.FC<PixiContainerProps> = memo(
 		height,
 		duration,
 		renderer,
-		onTransitionComplete,
+		pixiRenderer,
+		setLastFPS,
 	}: PixiContainerProps) {
 		const [setCanvasElement, canvasElement] = useCallbackRef<HTMLDivElement>()
+		const [chartData, handleTransitionComplete, tweenToggle] = useTweenData({
+			data,
+			setLastFPS,
+		})
+
 		// setup pixi instance
 		usePixiInstance({
-			data,
+			data: chartData,
 			width,
 			height,
 			containerElement: canvasElement,
 			duration,
-			onTransitionComplete,
+			onTransitionComplete: handleTransitionComplete,
 			renderer,
+			pixiRenderer,
+			tweenToggle,
 		})
 
-		const style: React.CSSProperties = useMemo(
-			() =>
-				({
-					visible:
-						renderer === Renderers.Canvas || renderer === Renderers.WebGL
-							? 'visible'
-							: 'hidden',
-				} as React.CSSProperties),
-			[renderer],
-		)
-		return (
-			<PixiElement
-				ref={setCanvasElement}
-				className="canvas-ref"
-				style={style}
-			/>
-		)
+		return <PixiElement ref={setCanvasElement} className="canvas-ref" />
 	},
 )
 

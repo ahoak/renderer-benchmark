@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback, useLayoutEffect } from 'react'
 import { Data } from '../../../hooks/useData'
 import { Renderers } from '../../Controls/RendererControls'
 import PixiRenderer from '../PIXI/PixiRenderer'
@@ -9,7 +9,8 @@ export interface D3Instance {
 	containerElement: SVGGElement | null
 	duration: number
 	renderer: Renderers
-	onTransitionComplete: (metrics: any) => void
+	onTransitionComplete: (metrics: any, tweenToggle: Boolean) => void
+	tweenToggle: Boolean
 }
 
 export function useD3Instance({
@@ -18,6 +19,7 @@ export function useD3Instance({
 	duration,
 	renderer,
 	onTransitionComplete,
+	tweenToggle,
 }: D3Instance): D3Renderer | undefined {
 	const [D3Instance, setD3Instance] = useState<D3Renderer | undefined>()
 
@@ -35,17 +37,20 @@ export function useD3Instance({
 		[containerElement, duration, onTransitionComplete],
 	)
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (D3Instance) {
 			if (renderer !== Renderers.SVG) {
 				D3Instance.remove()
+				setD3Instance(undefined)
 			} else {
-				D3Instance.onRendererSwitch(data)
+				D3Instance.onRendererSwitch(data, tweenToggle)
 			}
 		} else {
-			setUpSVG(D3Instance)
+			if (renderer === Renderers.SVG) {
+				setUpSVG(D3Instance)
+			}
 		}
-	}, [D3Instance, renderer, setUpSVG, data])
+	}, [renderer, D3Instance, setUpSVG, data, tweenToggle])
 
 	return D3Instance
 }

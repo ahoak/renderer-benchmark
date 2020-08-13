@@ -32,7 +32,6 @@ export const VisualizePage: React.FC<any> = memo(function VisualizePage() {
 	)
 
 	const chartData = useData(selectedNodeCount, chartDimensions)
-
 	const [selectedRenderer, onRendererChange] = useRendererSelection()
 
 	return (
