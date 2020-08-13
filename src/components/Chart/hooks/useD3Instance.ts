@@ -9,8 +9,8 @@ export interface D3Instance {
 	containerElement: SVGGElement | null
 	duration: number
 	renderer: Renderers
-	onTransitionComplete: (metrics: any, tweenToggle: Boolean) => void
-	tweenToggle: Boolean
+	onTransitionComplete: (metrics: any, tweenToggle: boolean) => void
+	tweenToggle: boolean
 }
 
 export function useD3Instance({

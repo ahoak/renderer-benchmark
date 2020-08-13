@@ -9,7 +9,7 @@ export interface D3RendererProps {
 	svgElementRef: SVGElement
 	onTransitionComplete: (
 		metrics: any,
-		tweenToggle: Boolean,
+		tweenToggle: boolean,
 		renderer?: Renderers,
 	) => void
 }
@@ -22,10 +22,10 @@ export class D3Renderer {
 	private abortTransition = false
 	private onTransitionComplete: (
 		metrics: any,
-		tweenToggle: Boolean,
+		tweenToggle: boolean,
 		renderer?: Renderers,
 	) => void
-	private inTransition: Boolean = false
+	private inTransition: boolean = false
 
 	constructor({
 		duration,
@@ -39,7 +39,7 @@ export class D3Renderer {
 
 	private handleInstrumentationComplete(
 		metrics: any,
-		tweenToggle: Boolean,
+		tweenToggle: boolean,
 		renderer?: Renderers,
 	) {
 		if (this.onTransitionComplete && !this.abortTransition) {
@@ -47,7 +47,7 @@ export class D3Renderer {
 		}
 	}
 
-	public onRendererSwitch(data: Data[], tweenToggle: Boolean) {
+	public onRendererSwitch(data: Data[], tweenToggle: boolean) {
 		if (this.currDataLength !== data.length) {
 			this.remove()
 			this.abortTransition = false
@@ -83,7 +83,7 @@ export class D3Renderer {
 
 	private updateTransition(
 		data: Data[],
-		tweenToggle: Boolean,
+		tweenToggle: boolean,
 		renderer: Renderers,
 	) {
 		const svg = select(this.svgElementRef)
