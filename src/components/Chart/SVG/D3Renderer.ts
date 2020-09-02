@@ -25,7 +25,7 @@ export class D3Renderer {
 		tweenToggle: boolean,
 		renderer?: Renderers,
 	) => void
-	private inTransition: boolean = false
+	private inTransition = false
 
 	constructor({
 		duration,
@@ -78,6 +78,7 @@ export class D3Renderer {
 			.attr('fill', (d: Data) => d.fill)
 			.attr('cx', (d: Data) => d.cx)
 			.attr('cy', (d: Data) => d.cy)
+			.attr('aria-label', (d: Data) => `circle-${d.fill}`)
 			.attr('fill-opacity', (d: Data) => d.fillOpacity)
 	}
 

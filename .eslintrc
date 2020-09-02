@@ -1,0 +1,21 @@
+{
+    "extends": ["@essex/eslint-config/release"],
+    "globals": {
+        "self": "writable"
+    },
+    "rules": {
+        // This rule has been disabled because the raw-loader plugin that
+        // rollup is using requires these to exist as import() statements.
+        "@typescript-eslint/ban-ts-ignore": 0,
+        "@typescript-eslint/ban-ts-comment": 0,
+        "header/header": 0,
+
+        // TODO: re-enable
+        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-non-null-assertion": 0,
+        "@typescript-eslint/ban-types": 0,
+        "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
+        "@typescript-eslint/explicit-module-boundary-types": 0
+    }
+}

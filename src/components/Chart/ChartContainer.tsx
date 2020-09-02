@@ -28,6 +28,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = memo(
 			setcData(data)
 		}, [setcData, data])
 
+		// provides a crude estimate of FPS, which can replicated in FPS counter in the inspector tools for verification
 		return (
 			<>
 				<FPSCounter>{`${Math.round(lastFPS)} FPS`}</FPSCounter>

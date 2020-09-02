@@ -25,8 +25,8 @@ class PixiRenderer {
 	private spriteMap: SpriteMap = {}
 	private rendererType: Renderers
 	private currDataLength = 0
-	private inTransition: boolean = false
-	private cancelOp: boolean = false
+	private inTransition = false
+	private cancelOp = false
 	private onTransitionComplete?: (metrics: any, tweenToggle: boolean) => void
 
 	constructor(

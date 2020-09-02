@@ -49,7 +49,12 @@ export const D3Container: React.FC<D3RendererProps> = memo(
 
 		return (
 			<div style={style}>
-				<svg width={width} height={height}>
+				<svg width={width} height={height} role="img">
+					<title> SVG Implementation of Benchmarking application</title>
+					<desc id="desc">
+						{' '}
+						Show increasing number of circles based on user selection
+					</desc>
 					<g ref={setD3ContainerElement} className="svg-test"></g>
 				</svg>
 			</div>
